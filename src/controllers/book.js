@@ -2,7 +2,8 @@ const { book } = require("../../models");
 
 exports.addBook = async (req, res) => {
   try {
-    const { title, publicationDate, pages, author, isbn, about } = req.body;
+    const { title, publicationDate, pages, author, isbn, about, bookFile } =
+      req.body;
 
     function getMMYYYY(d) {
       let month = [
@@ -34,7 +35,7 @@ exports.addBook = async (req, res) => {
       author: author,
       isbn: isbn,
       about: about,
-      bookFile: req.file.filename,
+      bookFile: bookFile,
     });
 
     res.status(200).send({
