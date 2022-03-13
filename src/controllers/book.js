@@ -1,31 +1,31 @@
 const { book } = require("../../models");
 
+let month = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "July",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+function getMMYYYY(d) {
+  let date = new Date(d);
+  let monthIndex = date.getMonth();
+  let year = date.getFullYear();
+
+  return `${month[monthIndex]} ${year}`;
+}
+
 exports.addBook = async (req, res) => {
   try {
     const { ...data } = req.body;
-
-    let month = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "July",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-
-    function getMMYYYY(d) {
-      let date = new Date(d);
-      let monthIndex = date.getMonth();
-      let year = date.getFullYear();
-
-      return `${month[monthIndex]} ${year}`;
-    }
 
     const newBook = await book.create({
       ...data,
@@ -68,10 +68,19 @@ exports.getBooks = async (req, res) => {
       },
     });
 
+    let bookData = books.map((item) => {
+      return {
+        ...item.dataValues,
+        publicationDate: getMMYYYY(item.publicationDate),
+      };
+    });
+
+    // console.log(bookData);
+
     res.status(200).send({
       status: "success",
       data: {
-        books,
+        books: bookData,
       },
     });
   } catch (error) {
@@ -113,7 +122,12 @@ exports.getDetailBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
   try {
     const { id } = req.params;
-    const { newData } = req.body;
+    const { ...data } = req.body;
+
+    const newData = {
+      ...data,
+      bookFile: req.file.filename,
+    };
 
     await book.update(newData, {
       where: {
@@ -121,16 +135,24 @@ exports.updateBook = async (req, res) => {
       },
     });
 
-    // const dataBook = await book.findOne({
-    //   where: {
-    //     id,
-    //   },
-    // });
+    let bookData = await book.findOne({
+      where: {
+        id,
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    bookData = JSON.parse(JSON.stringify(bookData));
 
     res.status(200).send({
       status: "success",
       data: {
-        book: newData,
+        book: {
+          ...bookData,
+          publicationDate: getMMYYYY(bookData.publicationDate),
+        },
       },
     });
   } catch (error) {

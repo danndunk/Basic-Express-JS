@@ -1,6 +1,6 @@
 const multer = require("multer");
 
-exports.uploadFile = (imageFile) => {
+exports.uploadImage = (imageFile) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, "uploads");
@@ -12,7 +12,7 @@ exports.uploadFile = (imageFile) => {
 
   const fileFilter = function (req, file, cb) {
     if (file.fieldname === imageFile) {
-      if (!file.originalname.match(/\.(epub|EPUB)$/)) {
+      if (!file.originalname.match(/\.(jpg|JPG|png|PNG|jpeg|JPEG)$/)) {
         req.fileValidationError = {
           message: "Only image files are allowed!",
         };
@@ -22,14 +22,11 @@ exports.uploadFile = (imageFile) => {
     cb(null, true);
   };
 
-  // const sizeInMB = 10;
-  // const maxSize = sizeInMB * 1000 * 1000;
-
   const upload = multer({
     storage,
     fileFilter,
     limits: {
-      fileSize: 10000000,
+      fileSize: 1000000,
     },
   }).single(imageFile);
 
