@@ -11,25 +11,25 @@ exports.uploadFile = (imageFile) => {
   });
 
   const fileFilter = function (req, file, cb) {
-    if (file.fieldname == imageFile) {
+    if (file.fieldname === imageFile) {
       if (!file.originalname.match(/\.(epub|EPUB)$/)) {
         req.fileValidationError = {
-          message: "only image file are allowed",
+          message: "Only image files are allowed!",
         };
-        return cb(new Error("only image file are allowed"), false);
+        return cb(new Error("Only image files are allowed!"), false);
       }
     }
     cb(null, true);
   };
 
-  const sizeInMB = 10;
-  const maxSize = sizeInMB * 1000 * 1000;
+  // const sizeInMB = 10;
+  // const maxSize = sizeInMB * 1000 * 1000;
 
   const upload = multer({
     storage,
     fileFilter,
     limits: {
-      fileSize: maxSize,
+      fileSize: 10000000,
     },
   }).single(imageFile);
 
@@ -46,7 +46,7 @@ exports.uploadFile = (imageFile) => {
       }
 
       if (err) {
-        if (err.code === "LIMIT_FILE_SIZE") {
+        if (err.code == "LIMIT_FILE_SIZE") {
           return res.status(400).send({
             message: "Max file size 10 MB",
           });

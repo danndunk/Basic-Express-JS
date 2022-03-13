@@ -2,25 +2,24 @@ const { book } = require("../../models");
 
 exports.addBook = async (req, res) => {
   try {
-    const { title, publicationDate, pages, author, isbn, about, bookFile } =
-      req.body;
+    const { ...data } = req.body;
+
+    let month = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "July",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
 
     function getMMYYYY(d) {
-      let month = [
-        "Januari",
-        "Februari",
-        "Maret",
-        "April",
-        "Mei",
-        "Juni",
-        "July",
-        "Agustus",
-        "September",
-        "Oktober",
-        "November",
-        "Desember",
-      ];
-
       let date = new Date(d);
       let monthIndex = date.getMonth();
       let year = date.getFullYear();
@@ -29,25 +28,27 @@ exports.addBook = async (req, res) => {
     }
 
     const newBook = await book.create({
-      title: title,
-      publicationDate: publicationDate,
-      pages: pages,
-      author: author,
-      isbn: isbn,
-      about: about,
-      bookFile: bookFile,
+      ...data,
+      bookFile: req.file.filename,
     });
+
+    let dataBook = await book.findOne({
+      where: {
+        id: newBook.id,
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    dataBook = JSON.parse(JSON.stringify(dataBook));
 
     res.status(200).send({
       status: "success...",
       data: {
-        title: newBook.title,
-        publicationDate: getMMYYYY(newBook.publicationDate),
-        pages: newBook.pages,
-        author: newBook.author,
-        isbn: newBook.isbn,
-        about: newBook.about,
-        bookFile: newBook.bookFile,
+        ...dataBook,
+        publicationDate: getMMYYYY(dataBook.publicationDate),
+        bookFile: "http://localhost:5000/uploads/" + dataBook.bookFile,
       },
     });
   } catch (error) {
@@ -112,13 +113,19 @@ exports.getDetailBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
   try {
     const { id } = req.params;
-    const newData = req.body;
+    const { data } = req.body;
 
-    await book.update(newData, {
+    const newData = await book.update(data, {
       where: {
         id,
       },
     });
+
+    // const dataBook = await book.findOne({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     res.status(200).send({
       status: "success",

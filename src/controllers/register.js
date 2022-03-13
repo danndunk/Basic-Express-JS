@@ -60,7 +60,7 @@ exports.register = async (req, res) => {
     const token = jwt.sign(dataToken, SECRET_KEY);
 
     res.status(200).send({
-      status: "success...",
+      status: "success",
       data: {
         user: {
           email: newUser.email,
