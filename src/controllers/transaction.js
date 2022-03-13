@@ -110,29 +110,37 @@ exports.getTransaction = async (req, res) => {
 
 exports.editTransaction = async (req, res) => {
   try {
-    // function getDurationTime(duration) {
-    //   const miliseconds = 1000;
-    //   const secondsInMinutes = 60;
-    //   const minutesInHours = 60;
-    //   const secondsInHours = secondsInMinutes * minutesInHours;
-    //   const hoursInDay = 24;
-
-    //   let timeDuration = new Date(duration);
-
-    //   let dayDuration = timeDuration / (miliseconds * secondsInHours * hoursInDay);
-
-    //   if (dayDuration >= 30) {
-    //     return Math.floor(dayDuration / 30) + " Months";
-    //   } else {
-    //     return Math.floor(dayDuration) + " Days";
-    //   }
-    // }
-
     const { id } = req.params;
     const { paymentStatus } = req.body;
 
+    const existTransaction = await transaction.findOne({
+      id,
+    });
+
+    function getDurationTime(updateTime) {
+      const updatedAt = new Date(updateTime);
+
+      const getDate = updatedAt.getDate();
+      const active = getDate + 30;
+
+      const endDate = new Date();
+      endDate.setDate(active);
+
+      const miliseconds = 1000;
+      const secondsInMinutes = 60;
+      const minutesInHours = 60;
+      const secondsInHours = secondsInMinutes * minutesInHours;
+      const hoursInDay = 24;
+
+      const timeDuration = endDate - updatedAt;
+      let dayDuration =
+        timeDuration / (miliseconds * secondsInHours * hoursInDay);
+
+      return dayDuration;
+    }
+
     const approvedData = {
-      remainingActive: 30,
+      remainingActive: getDurationTime(existTransaction.dataValues.updatedAt),
       userStatus: "Active",
       paymentStatus: "Approved",
     };
