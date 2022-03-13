@@ -113,9 +113,9 @@ exports.getDetailBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data } = req.body;
+    const { newData } = req.body;
 
-    const newData = await book.update(data, {
+    await book.update(newData, {
       where: {
         id,
       },
