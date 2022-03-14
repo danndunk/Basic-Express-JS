@@ -51,8 +51,8 @@ exports.register = async (req, res) => {
     });
 
     const dataToken = {
+      id: newUser.id,
       email: newUser.email,
-      fullname: newUser.fullname,
     };
 
     const SECRET_KEY = process.env.TOKEN_KEY;

@@ -141,6 +141,7 @@ exports.editTransaction = async (req, res) => {
 
     const approvedData = {
       remainingActive: getDurationTime(existTransaction.dataValues.updatedAt),
+      // remainingActive:30,
       userStatus: "Active",
       paymentStatus: "Approved",
     };

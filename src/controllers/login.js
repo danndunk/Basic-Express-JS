@@ -30,6 +30,12 @@ exports.login = async (req, res) => {
       },
     });
 
+    if (!userExist) {
+      return res.status(200).send({
+        message: "account not found",
+      });
+    }
+
     const isValid = await bcrypt.compare(req.body.password, userExist.password);
 
     if (!isValid) {
