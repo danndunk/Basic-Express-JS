@@ -17,7 +17,7 @@ exports.authAdmin = (req, res, next) => {
       return next();
     } else {
       return res.status(400).send({
-        message: "only admin can do it",
+        message: "you must be admin",
       });
     }
   });
