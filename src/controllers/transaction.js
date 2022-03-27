@@ -79,7 +79,7 @@ exports.getTransaction = async (req, res) => {
 
     const transactionData = await transaction.findOne({
       where: {
-        id,
+        idUser: id,
       },
       include: {
         model: user,
@@ -113,18 +113,16 @@ exports.editTransaction = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus } = req.body;
 
-    const existTransaction = await transaction.findOne({
-      id,
-    });
-
-    function getDurationTime(updateTime) {
-      const updatedAt = new Date(updateTime);
-
-      const getDate = updatedAt.getDate();
-      const active = getDate + 30;
+    function getDurationTime(startDate) {
+      startDate = new Date();
 
       const endDate = new Date();
-      endDate.setDate(active);
+
+      const getDateEndDate = endDate.getDate();
+
+      const set30daysEndDate = getDateEndDate + 30;
+
+      endDate.setDate(set30daysEndDate);
 
       const miliseconds = 1000;
       const secondsInMinutes = 60;
@@ -132,16 +130,17 @@ exports.editTransaction = async (req, res) => {
       const secondsInHours = secondsInMinutes * minutesInHours;
       const hoursInDay = 24;
 
-      const timeDuration = endDate - updatedAt;
+      const timeDuration = endDate - startDate;
       let dayDuration =
         timeDuration / (miliseconds * secondsInHours * hoursInDay);
 
       return dayDuration;
     }
 
+    const date = new Date();
+
     const approvedData = {
-      remainingActive: getDurationTime(existTransaction.dataValues.updatedAt),
-      // remainingActive:30,
+      remainingActive: getDurationTime(date),
       userStatus: "Active",
       paymentStatus: "Approved",
     };
@@ -149,7 +148,7 @@ exports.editTransaction = async (req, res) => {
     const notApprovedData = {
       remainingActive: 0,
       userStatus: "Not Active",
-      paymentStatus: "Approved",
+      paymentStatus: "Cancel",
     };
 
     if (paymentStatus === "approved" || paymentStatus === "Approved") {
@@ -166,7 +165,7 @@ exports.editTransaction = async (req, res) => {
       });
     }
 
-    const transactionData = await transaction.findOne({
+    let transactionData = await transaction.findOne({
       where: {
         id,
       },
@@ -178,9 +177,11 @@ exports.editTransaction = async (req, res) => {
         },
       },
       attributes: {
-        exclude: ["idUser", "createdAt", "updatedAt"],
+        exclude: ["idUser", "createdAt"],
       },
     });
+
+    transactionData = JSON.parse(JSON.stringify(transactionData));
 
     res.send({
       status: "success",

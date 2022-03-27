@@ -15,10 +15,8 @@ exports.login = async (req, res) => {
     const { error } = schema.validate(req.body);
 
     if (error)
-      return res.status(400).send({
-        error: {
-          message: error.details[0].message,
-        },
+      return res.status(200).send({
+        message: error.details[0].message,
       });
 
     const userExist = await user.findOne({
@@ -30,16 +28,10 @@ exports.login = async (req, res) => {
       },
     });
 
-    if (!userExist) {
-      return res.status(200).send({
-        message: "account not found",
-      });
-    }
-
     const isValid = await bcrypt.compare(req.body.password, userExist.password);
 
     if (!isValid) {
-      return res.status(400).send({
+      return res.status(200).send({
         status: "failed",
         message: "email or password doesnt match",
       });
@@ -57,17 +49,18 @@ exports.login = async (req, res) => {
     res.status(200).send({
       status: "success",
       data: {
-        user: {
-          email: userExist.email,
-          token: token,
-        },
+        id: userExist.id,
+        email: userExist.email,
+        fullname: userExist.fullname,
+        role: userExist.role,
+        token: token,
       },
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    res.status(200).send({
       status: "failed",
-      message: "Server Error",
+      message: "account is not registered",
     });
   }
 };

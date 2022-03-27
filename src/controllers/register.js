@@ -11,14 +11,16 @@ exports.register = async (req, res) => {
     const schema = Joi.object({
       email: Joi.string().email().min(5).required(),
       password: Joi.string().min(6).required(),
+      // .messages({
+      //   'string.empty:"password ga boleh kosong"
+      // })
       fullname: Joi.string().min(5).required(),
-      role: Joi.string().required(),
     });
 
     const { error } = schema.validate(req.body);
 
     if (error) {
-      return res.status(400).send({
+      return res.status(200).send({
         status: "error",
         message: error.details[0].message,
       });
@@ -34,7 +36,7 @@ exports.register = async (req, res) => {
     });
 
     if (userExist) {
-      return res.status(400).send({
+      return res.status(200).send({
         status: "failed",
         message: "email has already taken",
       });
@@ -47,7 +49,7 @@ exports.register = async (req, res) => {
       email: req.body.email,
       password: hashedPassword,
       fullname: req.body.fullname,
-      role: req.body.role,
+      role: "user",
     });
 
     const dataToken = {

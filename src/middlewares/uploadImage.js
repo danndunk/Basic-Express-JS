@@ -25,31 +25,31 @@ exports.uploadImage = (imageFile) => {
   const upload = multer({
     storage,
     fileFilter,
-    limits: {
+    /* limits: {
       fileSize: 1000000,
-    },
+    }, */
   }).single(imageFile);
 
   return (req, res, next) => {
     upload(req, res, function (err) {
       if (req.fileValidationError) {
-        return res.status(400).send(req.fileValidationError);
+        return res.status(200).send(req.fileValidationError);
       }
 
       if (!req.file && !err) {
-        return res.status(400).send({
+        return res.status(200).send({
           message: "Please select file to upload",
         });
       }
 
-      if (err) {
-        if (err.code == "LIMIT_FILE_SIZE") {
-          return res.status(400).send({
-            message: "Max file size 10 MB",
-          });
-        }
-        return res.status(400).send(err);
-      }
+      // if (err) {
+      //   if (err.code == "LIMIT_FILE_SIZE") {
+      //     return res.status(400).send({
+      //       message: "Max file size 10 MB",
+      //     });
+      //   }
+      //   return res.status(400).send(err);
+      // }
 
       return next();
     });

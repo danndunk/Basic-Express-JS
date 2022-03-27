@@ -29,7 +29,8 @@ exports.addBook = async (req, res) => {
 
     const newBook = await book.create({
       ...data,
-      bookFile: req.file.filename,
+      bookFile: req.files.bookFile[0].filename,
+      bookCover: req.files.bookCover[0].filename,
     });
 
     let dataBook = await book.findOne({
@@ -44,11 +45,12 @@ exports.addBook = async (req, res) => {
     dataBook = JSON.parse(JSON.stringify(dataBook));
 
     res.status(200).send({
-      status: "success...",
+      status: "success",
       data: {
         ...dataBook,
         publicationDate: getMMYYYY(dataBook.publicationDate),
-        bookFile: "http://localhost:5000/uploads/" + dataBook.bookFile,
+        bookFile: process.env.PATH_FILE + dataBook.bookFile,
+        bookCover: process.env.PATH_FILE + dataBook.bookCover,
       },
     });
   } catch (error) {
@@ -68,20 +70,18 @@ exports.getBooks = async (req, res) => {
       },
     });
 
-    let bookData = books.map((item) => {
+    let data = books.map((item) => {
       return {
         ...item.dataValues,
         publicationDate: getMMYYYY(item.publicationDate),
+        bookFile: process.env.PATH_FILE + item.bookFile,
+        bookCover: process.env.PATH_FILE + item.bookCover,
       };
     });
 
-    // console.log(bookData);
-
     res.status(200).send({
       status: "success",
-      data: {
-        books: bookData,
-      },
+      data,
     });
   } catch (error) {
     console.log(error);
@@ -95,7 +95,7 @@ exports.getBooks = async (req, res) => {
 exports.getDetailBook = async (req, res) => {
   try {
     const { id } = req.params;
-    const detailBook = await book.findOne({
+    let detailBook = await book.findOne({
       where: {
         id,
       },
@@ -103,6 +103,13 @@ exports.getDetailBook = async (req, res) => {
         exclude: ["createdAt", "updatedAt"],
       },
     });
+
+    detailBook = {
+      ...detailBook.dataValues,
+      publicationDate: getMMYYYY(detailBook.publicationDate),
+      bookFile: process.env.PATH_FILE + detailBook.bookFile,
+      bookCover: process.env.PATH_FILE + detailBook.bookCover,
+    };
 
     res.status(200).send({
       status: "success",
@@ -126,7 +133,8 @@ exports.updateBook = async (req, res) => {
 
     const newData = {
       ...data,
-      bookFile: req.file.filename,
+      bookFile: req.files.filename,
+      bookCover: req.files.filename,
     };
 
     await book.update(newData, {
@@ -152,6 +160,8 @@ exports.updateBook = async (req, res) => {
         book: {
           ...bookData,
           publicationDate: getMMYYYY(bookData.publicationDate),
+          bookFile: process.env.PATH_FILE + bookData.bookFile,
+          bookCover: process.env.PATH_FILE + bookData.bookCover,
         },
       },
     });
