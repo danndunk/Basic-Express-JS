@@ -133,8 +133,8 @@ exports.updateBook = async (req, res) => {
 
     const newData = {
       ...data,
-      bookFile: req.files.filename,
-      bookCover: req.files.filename,
+      bookFile: req.files.bookFile[0].filename,
+      bookCover: req.files.bookCover[0].filename,
     };
 
     await book.update(newData, {

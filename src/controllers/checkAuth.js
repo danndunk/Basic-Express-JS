@@ -2,7 +2,7 @@ const { user } = require("../../models");
 
 exports.checkAuth = async (req, res) => {
   try {
-    const id = req.user.id;
+    const { id } = req.user;
 
     const dataUser = await user.findOne({
       where: {
