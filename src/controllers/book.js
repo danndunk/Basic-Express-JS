@@ -1,26 +1,34 @@
 const { book } = require("../../models");
 
-let month = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "July",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
+// let month = [
+//   "Januari",
+//   "Februari",
+//   "Maret",
+//   "April",
+//   "Mei",
+//   "Juni",
+//   "July",
+//   "Agustus",
+//   "September",
+//   "Oktober",
+//   "November",
+//   "Desember",
+// ];
 
-function getMMYYYY(d) {
+function getYYYYMMDD(d) {
   let date = new Date(d);
-  let monthIndex = date.getMonth();
-  let year = date.getFullYear();
+  let getDate = date.getDate();
+  let getMonth = date.getMonth() + 1;
+  let getYear = date.getFullYear();
 
-  return `${month[monthIndex]} ${year}`;
+  if (getMonth < 10) {
+    getMonth = `0${getMonth}`;
+  }
+  if (getDate < 10) {
+    getDate = `0${getDate}`;
+  }
+
+  return `${getYear}-${getMonth}-${getDate}`;
 }
 
 exports.addBook = async (req, res) => {
@@ -48,7 +56,7 @@ exports.addBook = async (req, res) => {
       status: "success",
       data: {
         ...dataBook,
-        publicationDate: getMMYYYY(dataBook.publicationDate),
+        publicationDate: getYYYYMMDD(dataBook.publicationDate),
         bookFile: process.env.PATH_FILE + dataBook.bookFile,
         bookCover: process.env.PATH_FILE + dataBook.bookCover,
       },
@@ -73,7 +81,6 @@ exports.getBooks = async (req, res) => {
     let data = books.map((item) => {
       return {
         ...item.dataValues,
-        publicationDate: getMMYYYY(item.publicationDate),
         bookFile: process.env.PATH_FILE + item.bookFile,
         bookCover: process.env.PATH_FILE + item.bookCover,
       };
@@ -106,7 +113,7 @@ exports.getDetailBook = async (req, res) => {
 
     detailBook = {
       ...detailBook.dataValues,
-      publicationDate: getMMYYYY(detailBook.publicationDate),
+      publicationDate: getYYYYMMDD(detailBook.publicationDate),
       bookFile: process.env.PATH_FILE + detailBook.bookFile,
       bookCover: process.env.PATH_FILE + detailBook.bookCover,
     };
@@ -133,6 +140,7 @@ exports.updateBook = async (req, res) => {
 
     const newData = {
       ...data,
+      publicationDate: getYYYYMMDD(data.publicationDate),
       bookFile: req.files.bookFile[0].filename,
       bookCover: req.files.bookCover[0].filename,
     };
@@ -159,7 +167,7 @@ exports.updateBook = async (req, res) => {
       data: {
         book: {
           ...bookData,
-          publicationDate: getMMYYYY(bookData.publicationDate),
+          publicationDate: getYYYYMMDD(bookData.publicationDate),
           bookFile: process.env.PATH_FILE + bookData.bookFile,
           bookCover: process.env.PATH_FILE + bookData.bookCover,
         },
